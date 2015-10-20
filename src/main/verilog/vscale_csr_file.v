@@ -18,8 +18,8 @@ module vscale_csr_file(
                        input [`XPR_LEN-1:0]         exception_load_addr,
                        input [`XPR_LEN-1:0]         exception_PC,
                        output [`XPR_LEN-1:0]        handler_PC,
-                       output [`XPR_LEN-1:0]        epc,
-                       input                        htif_reset,
+                       output [`XPR_LEN-1:0]        epc
+                       /*input                        htif_reset,
                        input                        htif_pcr_req_valid,
                        output                       htif_pcr_req_ready,
                        input                        htif_pcr_req_rw,
@@ -28,9 +28,10 @@ module vscale_csr_file(
                        output                       htif_pcr_resp_valid,
                        input                        htif_pcr_resp_ready,
                        output [`HTIF_PCR_WIDTH-1:0] htif_pcr_resp_data
+							  */
                        );
 
-   localparam HTIF_STATE_IDLE = 0;
+   /*localparam HTIF_STATE_IDLE = 0;
    localparam HTIF_STATE_WAIT = 1;
 
    reg [`HTIF_PCR_WIDTH-1:0]                        htif_rdata;
@@ -38,6 +39,7 @@ module vscale_csr_file(
    reg                                              htif_state;
    reg                                              htif_fire;
    reg                                              next_htif_state;
+	*/
 
    reg [`CSR_COUNTER_WIDTH-1:0]                     cycle_full;
    reg [`CSR_COUNTER_WIDTH-1:0]                     time_full;
@@ -93,7 +95,8 @@ module vscale_csr_file(
    assign prv = priv_stack[2:1];
    assign ie = priv_stack[0];
 
-   assign host_wen = (htif_state == HTIF_STATE_IDLE) && htif_pcr_req_valid && htif_pcr_req_rw;
+   //assign host_wen = (htif_state == HTIF_STATE_IDLE) && htif_pcr_req_valid && htif_pcr_req_rw;
+	assign host_en = 1'b0;
    assign system_en = cmd[2];
    assign system_wen = cmd[1] || cmd[0];
    assign wen_internal = host_wen || system_wen;
@@ -104,9 +107,10 @@ module vscale_csr_file(
    assign illegal_access = illegal_region || (system_en && !defined);
 
    always @(*) begin
-      if (host_wen) begin
+      /*if (host_wen) begin
          wdata_internal = htif_pcr_req_data;
-      end else if (system_wen) begin
+			*/
+       if (system_wen) begin
          case (cmd)
            `CSR_SET : wdata_internal = rdata | wdata;
            `CSR_CLEAR : wdata_internal = rdata & ~wdata;
@@ -127,6 +131,7 @@ module vscale_csr_file(
       endcase // case (prv)
    end
 
+	/*
    always @(posedge clk) begin
       if (htif_reset)
         htif_state <= HTIF_STATE_IDLE;
@@ -135,7 +140,9 @@ module vscale_csr_file(
       if (htif_fire)
         htif_resp_data <= htif_rdata;
    end
-
+	*/
+	
+	/*
    always @(*) begin
       htif_fire = 1'b0;
       next_htif_state = htif_state;
@@ -157,7 +164,8 @@ module vscale_csr_file(
    assign htif_pcr_req_ready = (htif_state == HTIF_STATE_IDLE);
    assign htif_pcr_resp_valid = (htif_state == HTIF_STATE_WAIT);
    assign htif_pcr_resp_data = htif_resp_data;
-
+	*/
+	
    assign mcpuid = (1 << 20) | (1 << 8); // 'I' and 'U' bits set
    assign mimpid = 32'h8000;
    assign mhartid = 0;
@@ -249,6 +257,7 @@ module vscale_csr_file(
         mbadaddr <= wdata_internal;
    end
 
+	/*
    always @(*) begin
       case (htif_pcr_req_addr)
         `CSR_ADDR_TO_HOST : htif_rdata = to_host;
@@ -256,7 +265,8 @@ module vscale_csr_file(
         default : htif_rdata = 0;
       endcase // case (htif_pcr_req_addr)
    end // always @ begin
-
+	*/
+	
    always @(*) begin
       case (addr)
         `CSR_ADDR_CYCLE     : begin rdata = cycle_full[0+:`XPR_LEN]; defined = 1'b1; end
@@ -343,9 +353,10 @@ module vscale_csr_file(
               default : ;
             endcase // case (addr)
          end // if (wen_internal)
-         if (htif_fire && htif_pcr_req_addr == `CSR_ADDR_TO_HOST && !system_wen) begin
+         /*if (htif_fire && htif_pcr_req_addr == `CSR_ADDR_TO_HOST && !system_wen) begin
             to_host <= 0;
          end
+			*/
       end // else: !if(reset)
    end // always @ (posedge clk)
 

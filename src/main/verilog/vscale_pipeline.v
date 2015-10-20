@@ -18,16 +18,7 @@ module vscale_pipeline(
                        output [`XPR_LEN-1:0]        dmem_addr,
                        output [`XPR_LEN-1:0]        dmem_wdata_delayed,
                        input [`XPR_LEN-1:0]         dmem_rdata,
-                       input                        dmem_badmem_e,
-                       input                        htif_reset,
-                       input                        htif_pcr_req_valid,
-                       output                       htif_pcr_req_ready,
-                       input                        htif_pcr_req_rw,
-                       input [`CSR_ADDR_WIDTH-1:0]  htif_pcr_req_addr,
-                       input [`HTIF_PCR_WIDTH-1:0]  htif_pcr_req_data,
-                       output                       htif_pcr_resp_valid,
-                       input                        htif_pcr_resp_ready,
-                       output [`HTIF_PCR_WIDTH-1:0] htif_pcr_resp_data
+                       input                        dmem_badmem_e
                        );
 
    function [`XPR_LEN-1:0] store_data;
@@ -346,8 +337,8 @@ module vscale_pipeline(
                        .exception_PC(PC_WB),
                        .epc(epc),
                        .eret(eret),
-                       .handler_PC(handler_PC),
-                       .htif_reset(htif_reset),
+                       .handler_PC(handler_PC)
+                       /*.htif_reset(htif_reset),
                        .htif_pcr_req_valid(htif_pcr_req_valid),
                        .htif_pcr_req_ready(htif_pcr_req_ready),
                        .htif_pcr_req_rw(htif_pcr_req_rw),
@@ -356,6 +347,7 @@ module vscale_pipeline(
                        .htif_pcr_resp_valid(htif_pcr_resp_valid),
                        .htif_pcr_resp_ready(htif_pcr_resp_ready),
                        .htif_pcr_resp_data(htif_pcr_resp_data)
+							  */
                        );
 
 endmodule // vscale_pipeline
